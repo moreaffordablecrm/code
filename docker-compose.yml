@@ -1,0 +1,52 @@
+version: '2'
+services:
+  app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    image: viraj/moreaffordablecrm.com
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    ports:
+      - "1002:80"
+    networks:
+      - macrmnet
+    depends_on:
+      - mysql
+
+  node:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    image: node/moreaffordablecrm.com
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - macrmnet
+  mysql:
+    build:
+      context: ./docker/mysql
+      dockerfile: Dockerfile
+    image: mysql:moreaffordablecrm.com
+    command: mysqld --sql_mode=""
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "secret"
+      MYSQL_DATABASE: "moreaffordablecrm.com"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "secret"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - macrmnet
+networks:
+  macrmnet:
+    driver: "bridge"
+volumes:
+  mysqldata:
+    driver: "local"
+  redisdata:
+    driver: "local"
